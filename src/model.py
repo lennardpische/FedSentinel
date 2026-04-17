@@ -12,7 +12,7 @@ class FedModel:
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
-        elif torch.backends.mps.is_available:
+        elif torch.backends.mps.is_available():
             self.device = torch.device("mps")
         else:
             self.device = torch.device("cpu")
@@ -25,7 +25,7 @@ class FedModel:
 
     def preprocess_text(self, text):
         if not text: return ""
-        text = re.sub(r'\s+','', text)
+        text = re.sub(r'\s+', ' ', text)
         text = re.sub(r'\[.*?\]','',text)
         return text.strip()
     
@@ -33,7 +33,7 @@ class FedModel:
         clean_text = self.preprocess_text(text)
         inputs = self.tokenizer(
             clean_text,
-            return_tensor = 'pt',
+            return_tensors='pt',
             padding=True,
             truncation=True,
             max_length = 512
