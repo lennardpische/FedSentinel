@@ -1,34 +1,30 @@
 import os
 import sys
+import joblib
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from model import FedModel
+from train import LABEL_ORDER
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 MODEL_PATH = os.path.join(project_root, "data", "results", "rate_classifier.joblib")
 
-from evaluate import LABEL_ORDER
-
-def predict_next_decision(text: str, model_path: str = MODEL_PATH) -> dict:
-    from model import FedModel
-    from classifier import load_model
-    import numpy as np
-
+def predict_next_decision(text, model_path=MODEL_PATH):
     bert = FedModel()
-    pipeline = load_model(model_path)
+    pipeline = joblib.load(model_path)
 
-    embedding = bert.get_embedding(text)  # shape (1, 768)
-    prediction = pipeline.predict(embedding)[0]
-    proba = pipeline.predict_proba(embedding)[0]
+    embedding = bert.get_embedding(text)  # (1, 768)
+    pred_int  = int(pipeline.predict(embedding)[0])
+    proba     = pipeline.predict_proba(embedding)[0]
 
-    # pipeline.classes_ is the integer-encoded label array; map back to strings
-    le_classes = pipeline.classes_  # e.g. [0, 1, 2] corresponding to LABEL_ORDER
-    prob_dict = {LABEL_ORDER[cls]: float(prob) for cls, prob in zip(le_classes, proba)}
+    prediction = LABEL_ORDER[pred_int]
+    prob_dict  = {LABEL_ORDER[i]: float(proba[i]) for i in range(len(LABEL_ORDER))}
 
     return {
-        "prediction": LABEL_ORDER[int(prediction)],
+        "prediction": prediction,
         "probabilities": prob_dict,
-        "confidence": float(proba[list(le_classes).index(prediction)]),
+        "confidence": prob_dict[prediction],
     }
 
 if __name__ == "__main__":
@@ -38,11 +34,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     arg = sys.argv[1]
-    if os.path.isfile(arg):
-        with open(arg, "r", encoding="utf-8") as f:
-            text = f.read()
-    else:
-        text = arg
+    text = open(arg, encoding="utf-8").read() if os.path.isfile(arg) else arg
 
     result = predict_next_decision(text)
     print(f"\nPredicted next decision: {result['prediction']}")
