@@ -1,0 +1,33 @@
+# Virtual environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+* 2
+* 2.*
+* 2/
+
+# Model weights
+*.pt
+*.bin
+*.safetensors
+
+# Training data and artifacts (not needed at runtime)
+data/raw_html/
+data/results/*.png
+data/results/*.npy
+data/results/*.csv
+data/results/*.joblib_old
+
+# Scripts not used by the Gradio app
+train_classifier.py
+
+# Misc
+notebooks/
+FedSentinel/
+.gitkeep
