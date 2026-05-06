@@ -15,7 +15,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from model import FedModel
 from train import single_sample_features, LABEL_ORDER
 
-MODEL_PATH = os.path.join("data", "results", "rate_classifier.joblib")
+MODEL_PATH = "rate_classifier.joblib"
 
 print("Loading FinBERT...")
 bert = FedModel()
